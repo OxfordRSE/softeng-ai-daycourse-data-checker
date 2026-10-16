@@ -21,7 +21,7 @@ def check_file(path: Path) -> tuple[int, list[Issue]]:
     issues: list[Issue] = []
     issues.extend(find_missing(rows, "measurement"))
     issues.extend(find_duplicates(rows, "sample_id"))
-    issues.extend(check_numeric_range(rows, "measurement", 0.0, 100.0))
+    issues.extend(check_numeric_range(rows, "measurement", 0.0, 1000.0))
     measurements = []
     for row in rows:
         raw = row.get("measurement", "").strip()
