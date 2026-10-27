@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Iterable
 
@@ -28,9 +29,7 @@ def find_missing(rows: Iterable[dict[str, str]], column: str) -> list[Issue]:
 
 
 def find_duplicates(rows: Iterable[dict[str, str]], key: str) -> list[Issue]:
-    """Find repeated values in a column.
-
-    """
+    """Find repeated values in a column."""
     seen: dict[str, int] = {}
     issues: list[Issue] = []
     for row_number, row in enumerate(rows, start=2):
@@ -57,8 +56,17 @@ def check_numeric_range(
         try:
             value = float(raw)
         except ValueError:
-            issues.append(Issue("invalid", f"Non-numeric value in {column}: {raw}", row_number))
+            issues.append(
+                Issue("invalid", f"Non-numeric value in {column}: {raw}", row_number)
+            )
             continue
+
+        if not math.isfinite(value):
+            issues.append(
+                Issue("invalid", f"Non-finite value in {column}: {raw}", row_number)
+            )
+            continue
+
         if not in_range(value, minimum, maximum):
             issues.append(
                 Issue(
