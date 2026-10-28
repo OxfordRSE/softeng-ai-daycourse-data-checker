@@ -21,6 +21,8 @@ def test_positive_and_negative_infinity_are_invalid():
     assert len(issues) == 2
     assert [issue.kind for issue in issues] == ["invalid", "invalid"]
 
+# test for duplicate values in a column
+
 from research_check.checks import Issue, find_duplicates
 
 
