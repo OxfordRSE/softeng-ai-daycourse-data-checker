@@ -16,12 +16,16 @@ def load_rows(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
-def check_file(path: Path) -> tuple[int, list[Issue]]:
+def check_file(
+    path: Path,
+    minimum: float = 0.0,
+    maximum: float = 100.0,
+) -> tuple[int, list[Issue]]:
     rows = load_rows(path)
     issues: list[Issue] = []
     issues.extend(find_missing(rows, "measurement"))
     issues.extend(find_duplicates(rows, "sample_id"))
-    issues.extend(check_numeric_range(rows, "measurement", 0.0, 100.0))
+    issues.extend(check_numeric_range(rows, "measurement", minimum, maximum))
     measurements = []
     for row in rows:
         raw = row.get("measurement", "").strip()
@@ -37,9 +41,24 @@ def check_file(path: Path) -> tuple[int, list[Issue]]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check a research data CSV.")
     parser.add_argument("csv_file", type=Path)
+    parser.add_argument(
+        "--minimum",
+        type=float,
+        default=0.0,
+        help="minimum valid measurement (default: 0)",
+    )
+    parser.add_argument(
+        "--maximum",
+        type=float,
+        default=100.0,
+        help="maximum valid measurement (default: 100)",
+    )
     args = parser.parse_args()
 
-    row_count, issues = check_file(args.csv_file)
+    if args.minimum > args.maximum:
+        parser.error("--minimum must not be greater than --maximum")
+
+    row_count, issues = check_file(args.csv_file, args.minimum, args.maximum)
     print(format_report(args.csv_file.name, row_count, issues))
     return 0
 
