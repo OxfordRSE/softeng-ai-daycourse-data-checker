@@ -3,7 +3,7 @@
 ## Purpose and users
 
 - Help researchers identify potentially problematic measurements in CSV files before analysis.
-- Report problems without modifying the original data.
+
 
 ## Expected behaviour
 
@@ -29,3 +29,10 @@ The following are outside the scope of the current feature:
 
 - How should missing, non-numeric and non-finite measurements be classified?
 - Should future versions support multiple measurement columns?
+
+git status
+git diff  # unstaged changes
+git log --oneline --graph --all
+
+git switch -c my-changes
+
