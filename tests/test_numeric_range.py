@@ -20,3 +20,38 @@ def test_positive_and_negative_infinity_are_invalid():
 
     assert len(issues) == 2
     assert [issue.kind for issue in issues] == ["invalid", "invalid"]
+
+from research_check.checks import Issue, find_duplicates
+
+
+def test_find_duplicates_returns_no_issues_for_empty_rows():
+    assert find_duplicates([], "id") == []
+
+
+def test_find_duplicates_returns_no_issues_when_values_are_unique():
+    rows = [{"id": "a"}, {"id": "b"}]
+
+    assert find_duplicates(rows, "id") == []
+
+
+def test_find_duplicates_reports_each_repeat_with_its_row_number():
+    rows = [{"id": "a"}, {"id": "b"}, {"id": "a"}, {"id": "a"}]
+
+    assert find_duplicates(rows, "id") == [
+        Issue("duplicate", "Duplicate id: a", 4),
+        Issue("duplicate", "Duplicate id: a", 5),
+    ]
+
+
+def test_find_duplicates_compares_values_exactly():
+    rows = [{"id": "a"}, {"id": "A"}, {"id": " a "}]
+
+    assert find_duplicates(rows, "id") == []
+
+
+def test_find_duplicates_treats_missing_keys_as_empty_strings():
+    rows = [{}, {}]
+
+    assert find_duplicates(rows, "id") == [
+        Issue("duplicate", "Duplicate id: ", 3),
+    ]
